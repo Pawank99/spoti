@@ -104,7 +104,7 @@
         let currentTrackIndex = 0;
         let isPlaying = false;
 
-        // Your Apps Script URL
+        // Your Apps Script Backend URL
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxqc4FeyPzM9whIeidn8M81vjrMf92WSwSiaYC8dD-EZOk3GRaERNYBVZp7PHE6msyM/exec';
 
         // Event Listeners
@@ -134,7 +134,8 @@
                 .then(res => res.json())
                 .then(playlists => {
                     playlistList.innerHTML = playlists.map(p => `<li data-id="${p[0]}">${p[1]}</li>`).join('');
-                });
+                })
+                .catch(err => console.error('Error loading playlists:', err));
         }
 
         function handleSearch() {
@@ -151,7 +152,8 @@
                             <button onclick="addToPlaylist('${song[0]}')">Add to Playlist</button>
                         </div>
                     `).join('');
-                });
+                })
+                .catch(err => console.error('Error searching songs:', err));
         }
 
         function createPlaylist() {
@@ -163,7 +165,8 @@
             .then(() => {
                 playlistModal.style.display = 'none';
                 loadLibrary();
-            });
+            })
+            .catch(err => console.error('Error creating playlist:', err));
         }
 
         function playSong(url, title, artist) {
@@ -204,7 +207,8 @@
             fetch(`${SCRIPT_URL}`, {
                 method: 'POST',
                 body: new URLSearchParams({ action: 'addToPlaylist', playlistId, songId })
-            });
+            })
+            .catch(err => console.error('Error adding to playlist:', err));
         }
 
         // Load library on start
