@@ -1,2 +1,214 @@
-# spoti
-world is competetion now
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spotify Clone</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #121212; color: white; display: flex; height: 100vh; }
+        .sidebar { width: 250px; background-color: #000; padding: 20px; box-sizing: border-box; }
+        .logo { font-size: 24px; margin-bottom: 20px; }
+        nav a { display: block; color: #b3b3b3; text-decoration: none; margin: 10px 0; }
+        .playlists h3 { margin-top: 20px; }
+        #playlist-list { list-style: none; padding: 0; }
+        .main-content { flex: 1; padding: 20px; overflow-y: auto; }
+        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        #search-input { width: 300px; padding: 10px; background-color: #333; border: none; color: white; }
+        .player-bar { position: fixed; bottom: 0; width: 100%; background-color: #181818; padding: 10px; display: flex; align-items: center; justify-content: space-between; }
+        .track-info { display: flex; align-items: center; }
+        .track-info img { width: 50px; height: 50px; margin-right: 10px; }
+        .controls button { background: none; border: none; color: white; font-size: 20px; margin: 0 10px; }
+        .progress { flex: 1; margin: 0 20px; }
+        .modal { display: none; position: fixed; z-index: 1; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); }
+        .modal-content { background-color: #333; margin: 15% auto; padding: 20px; width: 300px; }
+        .close { float: right; cursor: pointer; }
+        .song { margin: 10px 0; padding: 10px; background: #333; }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="logo">Spotify Clone</div>
+        <nav>
+            <a href="#" id="home-link">Home</a>
+            <a href="#" id="search-link">Search</a>
+            <a href="#" id="library-link">Your Library</a>
+        </nav>
+        <div class="playlists">
+            <h3>Playlists</h3>
+            <ul id="playlist-list"></ul>
+            <button id="create-playlist-btn">Create Playlist</button>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <header>
+            <input type="text" id="search-input" placeholder="Search for songs, artists...">
+        </header>
+        <div id="content-area">
+            <div id="home-view">
+                <h2>Welcome to Spotify Clone</h2>
+                <p>Discover new music.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="player-bar">
+        <div class="track-info">
+            <img id="track-art" src="https://via.placeholder.com/50" alt="Track Art">
+            <div>
+                <p id="track-title">No track selected</p>
+                <p id="track-artist">Artist</p>
+            </div>
+        </div>
+        <div class="controls">
+            <button id="prev-btn">⏮</button>
+            <button id="play-pause-btn">▶</button>
+            <button id="next-btn">⏭</button>
+        </div>
+        <div class="progress">
+            <input type="range" id="progress-bar" min="0" max="100" value="0">
+        </div>
+        <audio id="audio-player"></audio>
+    </div>
+
+    <div id="playlist-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="close-modal">&times;</span>
+            <h2>Create Playlist</h2>
+            <input type="text" id="playlist-name" placeholder="Playlist Name" required>
+            <button id="save-playlist-btn">Save</button>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const homeLink = document.getElementById('home-link');
+        const searchLink = document.getElementById('search-link');
+        const libraryLink = document.getElementById('library-link');
+        const searchInput = document.getElementById('search-input');
+        const contentArea = document.getElementById('content-area');
+        const playlistList = document.getElementById('playlist-list');
+        const createPlaylistBtn = document.getElementById('create-playlist-btn');
+        const playlistModal = document.getElementById('playlist-modal');
+        const savePlaylistBtn = document.getElementById('save-playlist-btn');
+        const playPauseBtn = document.getElementById('play-pause-btn');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const progressBar = document.getElementById('progress-bar');
+        const audioPlayer = document.getElementById('audio-player');
+        const trackTitle = document.getElementById('track-title');
+        const trackArtist = document.getElementById('track-artist');
+
+        // State
+        let currentPlaylist = [];
+        let currentTrackIndex = 0;
+        let isPlaying = false;
+
+        // Apps Script URL (replace with your deployed URL)
+        const SCRIPT_URL = 'https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec';
+
+        // Event Listeners
+        homeLink.addEventListener('click', () => loadHome());
+        searchLink.addEventListener('click', () => loadSearch());
+        libraryLink.addEventListener('click', () => loadLibrary());
+        searchInput.addEventListener('input', handleSearch);
+        createPlaylistBtn.addEventListener('click', () => playlistModal.style.display = 'block');
+        savePlaylistBtn.addEventListener('click', createPlaylist);
+        playPauseBtn.addEventListener('click', togglePlayPause);
+        prevBtn.addEventListener('click', playPrevious);
+        nextBtn.addEventListener('click', playNext);
+        progressBar.addEventListener('input', seekTrack);
+        document.getElementById('close-modal').addEventListener('click', () => playlistModal.style.display = 'none');
+
+        // Functions
+        function loadHome() {
+            contentArea.innerHTML = '<h2>Welcome to Spotify Clone</h2><p>Discover new music.</p>';
+        }
+
+        function loadSearch() {
+            contentArea.innerHTML = '<h2>Search</h2><div id="search-results"></div>';
+        }
+
+        function loadLibrary() {
+            fetch(`${SCRIPT_URL}?action=getPlaylists`)
+                .then(res => res.json())
+                .then(playlists => {
+                    playlistList.innerHTML = playlists.map(p => `<li data-id="${p[0]}">${p[1]}</li>`).join('');
+                });
+        }
+
+        function handleSearch() {
+            const query = searchInput.value;
+            if (query.length < 3) return;
+            fetch(`${SCRIPT_URL}?action=searchSongs&q=${encodeURIComponent(query)}`)
+                .then(res => res.json())
+                .then(results => {
+                    const resultsDiv = document.getElementById('search-results');
+                    resultsDiv.innerHTML = results.map(song => `
+                        <div class="song">
+                            <p>${song[1]} - ${song[2]}</p>
+                            <button onclick="playSong('${song[3]}', '${song[1]}', '${song[2]}')">Play</button>
+                            <button onclick="addToPlaylist('${song[0]}')">Add to Playlist</button>
+                        </div>
+                    `).join('');
+                });
+        }
+
+        function createPlaylist() {
+            const name = document.getElementById('playlist-name').value;
+            fetch(`${SCRIPT_URL}`, {
+                method: 'POST',
+                body: new URLSearchParams({ action: 'createPlaylist', name })
+            })
+            .then(() => {
+                playlistModal.style.display = 'none';
+                loadLibrary();
+            });
+        }
+
+        function playSong(url, title, artist) {
+            audioPlayer.src = url;
+            trackTitle.textContent = title;
+            trackArtist.textContent = artist;
+            audioPlayer.play();
+            isPlaying = true;
+            playPauseBtn.textContent = '⏸';
+        }
+
+        function togglePlayPause() {
+            if (isPlaying) {
+                audioPlayer.pause();
+                playPauseBtn.textContent = '▶';
+            } else {
+                audioPlayer.play();
+                playPauseBtn.textContent = '⏸';
+            }
+            isPlaying = !isPlaying;
+        }
+
+        function playPrevious() {
+            // Implement with playlist data
+        }
+
+        function playNext() {
+            // Implement with playlist data
+        }
+
+        function seekTrack() {
+            const seekTime = (progressBar.value / 100) * audioPlayer.duration;
+            audioPlayer.currentTime = seekTime;
+        }
+
+        function addToPlaylist(songId) {
+            const playlistId = prompt('Enter Playlist ID (from library):'); // Simple prompt; improve with dropdown
+            fetch(`${SCRIPT_URL}`, {
+                method: 'POST',
+                body: new URLSearchParams({ action: 'addToPlaylist', playlistId, songId })
+            });
+        }
+
+        // Load library on start
+        loadLibrary();
+    </script>
+</body>
+</html>
