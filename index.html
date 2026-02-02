@@ -1,185 +1,3 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <title>Neon Music Player</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <style>
-    :root {
-      --bg: #050510;
-      --accent: #a855ff;
-      --accent2: #6366f1;
-      --text: #f9fafb;
-      --text-muted: #9ca3af;
-    }
-
-    body {
-      margin: 0;
-      background: radial-gradient(circle at top, #1f2937 0, #020617 45%, #000 100%);
-      color: var(--text);
-      font-family: system-ui, sans-serif;
-      display: flex;
-      justify-content: center;
-      padding: 20px;
-    }
-
-    .app {
-      width: 100%;
-      max-width: 1100px;
-      background: rgba(15, 23, 42, 0.85);
-      border-radius: 20px;
-      border: 1px solid rgba(148, 163, 184, 0.25);
-      box-shadow: 0 0 40px rgba(168, 85, 255, 0.25);
-      display: grid;
-      grid-template-columns: 300px 1fr;
-      overflow: hidden;
-    }
-
-    .sidebar {
-      padding: 20px;
-      border-right: 1px solid rgba(148, 163, 184, 0.25);
-      background: rgba(15, 23, 42, 0.9);
-    }
-
-    .search-box input {
-      width: 100%;
-      padding: 10px;
-      border-radius: 10px;
-      border: 1px solid rgba(148, 163, 184, 0.3);
-      background: rgba(15, 23, 42, 0.9);
-      color: var(--text);
-    }
-
-    .results, .playlists {
-      margin-top: 15px;
-      max-height: 250px;
-      overflow-y: auto;
-      border: 1px solid rgba(148, 163, 184, 0.25);
-      border-radius: 10px;
-      padding: 10px;
-    }
-
-    .song-item, .playlist-item {
-      padding: 8px;
-      border-radius: 8px;
-      margin-bottom: 6px;
-      cursor: pointer;
-      background: rgba(30, 41, 59, 0.4);
-    }
-
-    .song-item:hover, .playlist-item:hover {
-      background: rgba(168, 85, 255, 0.25);
-    }
-
-    .main {
-      padding: 20px;
-    }
-
-    .art-wrapper img {
-      width: 260px;
-      height: 260px;
-      border-radius: 12px;
-      object-fit: cover;
-      box-shadow: 0 0 25px rgba(168, 85, 255, 0.5);
-    }
-
-    #visualizer {
-      width: 100%;
-      height: 80px;
-      margin-top: 20px;
-      background: rgba(15, 23, 42, 0.8);
-      border-radius: 10px;
-    }
-
-    .controls {
-      margin-top: 20px;
-      display: flex;
-      gap: 10px;
-      align-items: center;
-    }
-
-    .btn {
-      padding: 10px 15px;
-      border-radius: 8px;
-      background: rgba(168, 85, 255, 0.3);
-      border: 1px solid rgba(168, 85, 255, 0.6);
-      color: var(--text);
-      cursor: pointer;
-    }
-
-    .mixer {
-      margin-top: 20px;
-      display: flex;
-      gap: 20px;
-    }
-
-    .mixer input {
-      width: 100px;
-    }
-  </style>
-</head>
-<body>
-
-<div class="app">
-
-  <!-- SIDEBAR -->
-  <div class="sidebar">
-    <div class="search-box">
-      <input id="searchInput" placeholder="Search songs..." />
-    </div>
-
-    <h3>Results</h3>
-    <div id="results" class="results"></div>
-
-    <h3>Playlists</h3>
-    <div id="playlists" class="playlists"></div>
-
-    <input id="newPlaylistName" placeholder="New playlist" style="margin-top:10px;width:100%;padding:8px;border-radius:8px;border:1px solid #555;background:#111;color:white;">
-    <button id="createPlaylistBtn" class="btn" style="margin-top:8px;width:100%;">Create</button>
-  </div>
-
-  <!-- MAIN PLAYER -->
-  <div class="main">
-    <div class="art-wrapper">
-      <img id="trackArt" src="">
-    </div>
-
-    <h2 id="trackTitle">Select a song</h2>
-    <h4 id="trackArtist" style="color:var(--text-muted)">Your neon player is ready</h4>
-
-    <canvas id="visualizer"></canvas>
-
-    <div class="controls">
-      <button id="prevBtn" class="btn">⏮</button>
-      <button id="playPauseBtn" class="btn">▶</button>
-      <button id="nextBtn" class="btn">⏭</button>
-      <button id="shuffleBtn" class="btn">Shuffle</button>
-    </div>
-
-    <div class="mixer">
-      <div>
-        <label>Bass</label><br>
-        <input type="range" id="bassSlider" min="-10" max="10" value="0">
-      </div>
-      <div>
-        <label>Treble</label><br>
-        <input type="range" id="trebleSlider" min="-10" max="10" value="0">
-      </div>
-      <div>
-        <label>Speed</label><br>
-        <input type="range" id="speedSlider" min="0.5" max="1.5" step="0.1" value="1">
-      </div>
-      <div>
-        <label>Volume</label><br>
-        <input type="range" id="volumeSlider" min="0" max="1" step="0.01" value="1">
-      </div>
-    </div>
-
-    <audio id="audio"></audio>
-  </div>
-
-</div>
-
 <script>
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzPjpnJz7FW9QnpzlWOHvM6E_Wp-sy17x8jGXj76ZwSuEGdK5g-aGxphrtHkzxwzaTR/exec";
 
@@ -187,17 +5,11 @@ let songs = [];
 let playlists = [];
 let currentIndex = -1;
 let isPlaying = false;
-let shuffle = false;
 
 const audio = document.getElementById("audio");
 const trackArt = document.getElementById("trackArt");
 const trackTitle = document.getElementById("trackTitle");
 const trackArtist = document.getElementById("trackArtist");
-
-const canvas = document.getElementById("visualizer");
-const ctx = canvas.getContext("2d");
-
-let audioCtx, analyser, sourceNode;
 
 // SEARCH
 document.getElementById("searchInput").addEventListener("input", async e => {
@@ -209,7 +21,7 @@ document.getElementById("searchInput").addEventListener("input", async e => {
   renderResults();
 });
 
-// RENDER SEARCH RESULTS
+// RENDER RESULTS
 function renderResults() {
   const box = document.getElementById("results");
   box.innerHTML = "";
@@ -237,8 +49,6 @@ function playSong(i) {
   trackArt.src = art || "";
 
   document.getElementById("playPauseBtn").textContent = "⏸";
-
-  setupVisualizer();
 }
 
 // PLAY/PAUSE
@@ -269,48 +79,29 @@ document.getElementById("prevBtn").onclick = () => {
   playSong(currentIndex);
 };
 
-// SHUFFLE
-document.getElementById("shuffleBtn").onclick = () => {
-  shuffle = !shuffle;
-  document.getElementById("shuffleBtn").style.background = shuffle ? "rgba(168,85,255,0.6)" : "rgba(168,85,255,0.3)";
+// PROGRESS BAR
+audio.addEventListener("timeupdate", () => {
+  const fill = document.getElementById("progressFill");
+  const current = document.getElementById("currentTime");
+  const duration = document.getElementById("duration");
+
+  if (!audio.duration) return;
+
+  fill.style.width = (audio.currentTime / audio.duration) * 100 + "%";
+  current.textContent = formatTime(audio.currentTime);
+  duration.textContent = formatTime(audio.duration);
+});
+
+document.getElementById("progressBar").onclick = e => {
+  const rect = e.target.getBoundingClientRect();
+  const ratio = (e.clientX - rect.left) / rect.width;
+  audio.currentTime = ratio * audio.duration;
 };
 
-// MIXER
-document.getElementById("volumeSlider").oninput = e => audio.volume = e.target.value;
-document.getElementById("speedSlider").oninput = e => audio.playbackRate = e.target.value;
-
-// VISUALIZER
-function setupVisualizer() {
-  if (!audioCtx) audioCtx = new AudioContext();
-
-  if (sourceNode) sourceNode.disconnect();
-
-  sourceNode = audioCtx.createMediaElementSource(audio);
-  analyser = audioCtx.createAnalyser();
-  analyser.fftSize = 256;
-
-  sourceNode.connect(analyser);
-  analyser.connect(audioCtx.destination);
-
-  drawBars();
-}
-
-function drawBars() {
-  requestAnimationFrame(drawBars);
-
-  const buffer = new Uint8Array(analyser.frequencyBinCount);
-  analyser.getByteFrequencyData(buffer);
-
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-  const barWidth = canvas.width / 50;
-
-  for (let i = 0; i < 50; i++) {
-    const h = buffer[i] * 0.6;
-    ctx.fillStyle = `rgb(${150 + h}, ${80}, 255)`;
-    ctx.fillRect(i * barWidth, canvas.height - h, barWidth - 2, h);
-  }
-}
+// VOLUME
+document.getElementById("volumeSlider").oninput = e => {
+  audio.volume = e.target.value;
+};
 
 // PLAYLISTS
 async function loadPlaylists() {
@@ -344,8 +135,11 @@ document.getElementById("createPlaylistBtn").onclick = async () => {
   loadPlaylists();
 };
 
+function formatTime(sec) {
+  const m = Math.floor(sec / 60);
+  const s = Math.floor(sec % 60);
+  return `${m}:${s < 10 ? "0" + s : s}`;
+}
+
 loadPlaylists();
 </script>
-
-</body>
-</html>
