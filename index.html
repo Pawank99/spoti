@@ -5,24 +5,120 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Spotify Clone</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #121212; color: white; display: flex; height: 100vh; }
-        .sidebar { width: 250px; background-color: #000; padding: 20px; box-sizing: border-box; }
-        .logo { font-size: 24px; margin-bottom: 20px; }
-        nav a { display: block; color: #b3b3b3; text-decoration: none; margin: 10px 0; }
-        .playlists h3 { margin-top: 20px; }
-        #playlist-list { list-style: none; padding: 0; }
-        .main-content { flex: 1; padding: 20px; overflow-y: auto; }
-        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        #search-input { width: 300px; padding: 10px; background-color: #333; border: none; color: white; }
-        .player-bar { position: fixed; bottom: 0; width: 100%; background-color: #181818; padding: 10px; display: flex; align-items: center; justify-content: space-between; }
-        .track-info { display: flex; align-items: center; }
-        .track-info img { width: 50px; height: 50px; margin-right: 10px; }
-        .controls button { background: none; border: none; color: white; font-size: 20px; margin: 0 10px; }
-        .progress { flex: 1; margin: 0 20px; }
-        .modal { display: none; position: fixed; z-index: 1; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); }
-        .modal-content { background-color: #333; margin: 15% auto; padding: 20px; width: 300px; }
-        .close { float: right; cursor: pointer; }
-        .song { margin: 10px 0; padding: 10px; background: #333; }
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #121212;
+            color: white;
+            display: flex;
+            height: 100vh;
+        }
+        .sidebar {
+            width: 250px;
+            background-color: #000;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .logo {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        nav a {
+            display: block;
+            color: #b3b3b3;
+            text-decoration: none;
+            margin: 10px 0;
+        }
+        .playlists h3 {
+            margin-top: 20px;
+        }
+        #playlist-list {
+            list-style: none;
+            padding: 0;
+        }
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        #search-input {
+            width: 300px;
+            padding: 10px;
+            background-color: #333;
+            border: none;
+            color: white;
+        }
+        .player-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: #181818;
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-sizing: border-box;
+        }
+        .track-info {
+            display: flex;
+            align-items: center;
+        }
+        .track-info img {
+            width: 50px;
+            height: 50px;
+            margin-right: 10px;
+        }
+        .controls button {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 20px;
+            margin: 0 10px;
+            cursor: pointer;
+        }
+        .progress {
+            flex: 1;
+            margin: 0 20px;
+        }
+        .progress input[type="range"] {
+            width: 100%;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+        .modal-content {
+            background-color: #333;
+            margin: 15% auto;
+            padding: 20px;
+            width: 300px;
+        }
+        .close {
+            float: right;
+            cursor: pointer;
+        }
+        .song {
+            margin: 10px 0;
+            padding: 10px;
+            background: #333;
+        }
+        .song button {
+            margin-right: 8px;
+        }
     </style>
 </head>
 <body>
@@ -99,28 +195,76 @@
         const trackTitle = document.getElementById('track-title');
         const trackArtist = document.getElementById('track-artist');
 
-        // State
-        let currentPlaylist = [];
+        // Your Apps Script URL (Google Sheets backend)
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxqc4FeyPzM9whIeidn8M81vjrMf92WSwSiaYC8dD-EZOk3GRaERNYBVZp7PHE6msyM/exec';
+
+        // Built‑in playlist (your 4 songs)
+        let currentPlaylist = [
+            {
+                url: "https://cdnsongs.com/music/data/Single_Track/201605/Dasi_Na_Mere_Baare/128/Dasi_Na_Mere_Baare_1.mp3",
+                title: "Dasi Na Mere Baare",
+                artist: "Punjabi Artist"
+            },
+            {
+                url: "https://cdnsongs.com/music/data/Punjabi/202511/ROMEO/128/Together.mp3",
+                title: "Together",
+                artist: "Punjabi Artist"
+            },
+            {
+                url: "https://cdnsongs.com/music/data/Punjabi/202509/House_Navior/128/Deewane_1.mp3",
+                title: "Deewane",
+                artist: "Punjabi Artist"
+            },
+            {
+                url: "https://cdnsongs.com/music/data/Punjabi/202508/A_For_Arjan_2/128/Love_Gone.mp3",
+                title: "Love Gone",
+                artist: "Punjabi Artist"
+            }
+        ];
+
         let currentTrackIndex = 0;
         let isPlaying = false;
 
-        // Your Apps Script Backend URL
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxqc4FeyPzM9whIeidn8M81vjrMf92WSwSiaYC8dD-EZOk3GRaERNYBVZp7PHE6msyM/exec';
+        // Navigation
+        homeLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            loadHome();
+        });
 
-        // Event Listeners
-        homeLink.addEventListener('click', () => loadHome());
-        searchLink.addEventListener('click', () => loadSearch());
-        libraryLink.addEventListener('click', () => loadLibrary());
+        searchLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            loadSearch();
+        });
+
+        libraryLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            loadLibrary();
+        });
+
         searchInput.addEventListener('input', handleSearch);
         createPlaylistBtn.addEventListener('click', () => playlistModal.style.display = 'block');
         savePlaylistBtn.addEventListener('click', createPlaylist);
+        document.getElementById('close-modal').addEventListener('click', () => playlistModal.style.display = 'none');
+
+        // Player controls
         playPauseBtn.addEventListener('click', togglePlayPause);
         prevBtn.addEventListener('click', playPrevious);
         nextBtn.addEventListener('click', playNext);
         progressBar.addEventListener('input', seekTrack);
-        document.getElementById('close-modal').addEventListener('click', () => playlistModal.style.display = 'none');
 
-        // Functions
+        // Update progress bar as audio plays
+        audioPlayer.addEventListener('timeupdate', () => {
+            if (audioPlayer.duration) {
+                progressBar.value = (audioPlayer.currentTime / audioPlayer.duration) * 100;
+            }
+        });
+
+        // Auto-next when track ends
+        audioPlayer.addEventListener('ended', () => {
+            playNext();
+        });
+
+        // Views
         function loadHome() {
             contentArea.innerHTML = '<h2>Welcome to Spotify Clone</h2><p>Discover new music.</p>';
         }
@@ -133,14 +277,18 @@
             fetch(`${SCRIPT_URL}?action=getPlaylists`)
                 .then(res => res.json())
                 .then(playlists => {
-                    playlistList.innerHTML = playlists.map(p => `<li data-id="${p[0]}">${p[1]}</li>`).join('');
+                    playlistList.innerHTML = playlists
+                        .map(p => `<li data-id="${p[0]}">${p[1]}</li>`)
+                        .join('');
                 })
                 .catch(err => console.error('Error loading playlists:', err));
         }
 
+        // Search
         function handleSearch() {
             const query = searchInput.value;
             if (query.length < 3) return;
+
             fetch(`${SCRIPT_URL}?action=searchSongs&q=${encodeURIComponent(query)}`)
                 .then(res => res.json())
                 .then(results => {
@@ -148,7 +296,7 @@
                     resultsDiv.innerHTML = results.map(song => `
                         <div class="song">
                             <p>${song[1]} - ${song[2]}</p>
-                            <button onclick="playSong('${song[3]}', '${song[1]}', '${song[2]}')">Play</button>
+                            <button onclick="playSongFromSearch('${song[3]}', '${song[1]}', '${song[2]}')">Play</button>
                             <button onclick="addToPlaylist('${song[0]}')">Add to Playlist</button>
                         </div>
                     `).join('');
@@ -156,19 +304,24 @@
                 .catch(err => console.error('Error searching songs:', err));
         }
 
+        // Playlist creation
         function createPlaylist() {
             const name = document.getElementById('playlist-name').value;
-            fetch(`${SCRIPT_URL}`, {
+            if (!name.trim()) return;
+
+            fetch(SCRIPT_URL, {
                 method: 'POST',
                 body: new URLSearchParams({ action: 'createPlaylist', name })
             })
             .then(() => {
                 playlistModal.style.display = 'none';
+                document.getElementById('playlist-name').value = '';
                 loadLibrary();
             })
             .catch(err => console.error('Error creating playlist:', err));
         }
 
+        // Core play function (used by playlist + search)
         function playSong(url, title, artist) {
             audioPlayer.src = url;
             trackTitle.textContent = title;
@@ -178,7 +331,19 @@
             playPauseBtn.textContent = '⏸';
         }
 
+        // Called from search results (does not change currentPlaylist index)
+        window.playSongFromSearch = function(url, title, artist) {
+            playSong(url, title, artist);
+        };
+
         function togglePlayPause() {
+            if (!audioPlayer.src) {
+                // If nothing loaded yet, start with first track in playlist
+                const track = currentPlaylist[currentTrackIndex];
+                playSong(track.url, track.title, track.artist);
+                return;
+            }
+
             if (isPlaying) {
                 audioPlayer.pause();
                 playPauseBtn.textContent = '▶';
@@ -190,28 +355,48 @@
         }
 
         function playPrevious() {
-            // Implement with playlist data
+            if (currentPlaylist.length === 0) return;
+
+            currentTrackIndex =
+                (currentTrackIndex - 1 + currentPlaylist.length) % currentPlaylist.length;
+
+            const track = currentPlaylist[currentTrackIndex];
+            playSong(track.url, track.title, track.artist);
         }
 
         function playNext() {
-            // Implement with playlist data
+            if (currentPlaylist.length === 0) return;
+
+            currentTrackIndex =
+                (currentTrackIndex + 1) % currentPlaylist.length;
+
+            const track = currentPlaylist[currentTrackIndex];
+            playSong(track.url, track.title, track.artist);
         }
 
         function seekTrack() {
+            if (!audioPlayer.duration) return;
             const seekTime = (progressBar.value / 100) * audioPlayer.duration;
             audioPlayer.currentTime = seekTime;
         }
 
         function addToPlaylist(songId) {
-            const playlistId = prompt('Enter Playlist ID (from library):'); // Simple prompt; improve with dropdown
-            fetch(`${SCRIPT_URL}`, {
+            const playlistId = prompt('Enter Playlist ID (from library):');
+            if (!playlistId) return;
+
+            fetch(SCRIPT_URL, {
                 method: 'POST',
-                body: new URLSearchParams({ action: 'addToPlaylist', playlistId, songId })
+                body: new URLSearchParams({
+                    action: 'addToPlaylist',
+                    playlistId,
+                    songId
+                })
             })
             .catch(err => console.error('Error adding to playlist:', err));
         }
 
-        // Load library on start
+        // Initial load
+        loadHome();
         loadLibrary();
     </script>
 </body>
