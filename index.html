@@ -1,403 +1,351 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Spotify Clone</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #121212;
-            color: white;
-            display: flex;
-            height: 100vh;
-        }
-        .sidebar {
-            width: 250px;
-            background-color: #000;
-            padding: 20px;
-            box-sizing: border-box;
-        }
-        .logo {
-            font-size: 24px;
-            margin-bottom: 20px;
-        }
-        nav a {
-            display: block;
-            color: #b3b3b3;
-            text-decoration: none;
-            margin: 10px 0;
-        }
-        .playlists h3 {
-            margin-top: 20px;
-        }
-        #playlist-list {
-            list-style: none;
-            padding: 0;
-        }
-        .main-content {
-            flex: 1;
-            padding: 20px;
-            overflow-y: auto;
-        }
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-        #search-input {
-            width: 300px;
-            padding: 10px;
-            background-color: #333;
-            border: none;
-            color: white;
-        }
-        .player-bar {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            background-color: #181818;
-            padding: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            box-sizing: border-box;
-        }
-        .track-info {
-            display: flex;
-            align-items: center;
-        }
-        .track-info img {
-            width: 50px;
-            height: 50px;
-            margin-right: 10px;
-        }
-        .controls button {
-            background: none;
-            border: none;
-            color: white;
-            font-size: 20px;
-            margin: 0 10px;
-            cursor: pointer;
-        }
-        .progress {
-            flex: 1;
-            margin: 0 20px;
-        }
-        .progress input[type="range"] {
-            width: 100%;
-        }
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.5);
-        }
-        .modal-content {
-            background-color: #333;
-            margin: 15% auto;
-            padding: 20px;
-            width: 300px;
-        }
-        .close {
-            float: right;
-            cursor: pointer;
-        }
-        .song {
-            margin: 10px 0;
-            padding: 10px;
-            background: #333;
-        }
-        .song button {
-            margin-right: 8px;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <title>Neon Music Player</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    :root {
+      --bg: #050510;
+      --accent: #a855ff;
+      --accent2: #6366f1;
+      --text: #f9fafb;
+      --text-muted: #9ca3af;
+    }
+
+    body {
+      margin: 0;
+      background: radial-gradient(circle at top, #1f2937 0, #020617 45%, #000 100%);
+      color: var(--text);
+      font-family: system-ui, sans-serif;
+      display: flex;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 1100px;
+      background: rgba(15, 23, 42, 0.85);
+      border-radius: 20px;
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      box-shadow: 0 0 40px rgba(168, 85, 255, 0.25);
+      display: grid;
+      grid-template-columns: 300px 1fr;
+      overflow: hidden;
+    }
+
+    .sidebar {
+      padding: 20px;
+      border-right: 1px solid rgba(148, 163, 184, 0.25);
+      background: rgba(15, 23, 42, 0.9);
+    }
+
+    .search-box input {
+      width: 100%;
+      padding: 10px;
+      border-radius: 10px;
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      background: rgba(15, 23, 42, 0.9);
+      color: var(--text);
+    }
+
+    .results, .playlists {
+      margin-top: 15px;
+      max-height: 250px;
+      overflow-y: auto;
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      border-radius: 10px;
+      padding: 10px;
+    }
+
+    .song-item, .playlist-item {
+      padding: 8px;
+      border-radius: 8px;
+      margin-bottom: 6px;
+      cursor: pointer;
+      background: rgba(30, 41, 59, 0.4);
+    }
+
+    .song-item:hover, .playlist-item:hover {
+      background: rgba(168, 85, 255, 0.25);
+    }
+
+    .main {
+      padding: 20px;
+    }
+
+    .art-wrapper img {
+      width: 260px;
+      height: 260px;
+      border-radius: 12px;
+      object-fit: cover;
+      box-shadow: 0 0 25px rgba(168, 85, 255, 0.5);
+    }
+
+    #visualizer {
+      width: 100%;
+      height: 80px;
+      margin-top: 20px;
+      background: rgba(15, 23, 42, 0.8);
+      border-radius: 10px;
+    }
+
+    .controls {
+      margin-top: 20px;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .btn {
+      padding: 10px 15px;
+      border-radius: 8px;
+      background: rgba(168, 85, 255, 0.3);
+      border: 1px solid rgba(168, 85, 255, 0.6);
+      color: var(--text);
+      cursor: pointer;
+    }
+
+    .mixer {
+      margin-top: 20px;
+      display: flex;
+      gap: 20px;
+    }
+
+    .mixer input {
+      width: 100px;
+    }
+  </style>
 </head>
 <body>
-    <div class="sidebar">
-        <div class="logo">Spotify Clone</div>
-        <nav>
-            <a href="#" id="home-link">Home</a>
-            <a href="#" id="search-link">Search</a>
-            <a href="#" id="library-link">Your Library</a>
-        </nav>
-        <div class="playlists">
-            <h3>Playlists</h3>
-            <ul id="playlist-list"></ul>
-            <button id="create-playlist-btn">Create Playlist</button>
-        </div>
+
+<div class="app">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="search-box">
+      <input id="searchInput" placeholder="Search songs..." />
     </div>
 
-    <div class="main-content">
-        <header>
-            <input type="text" id="search-input" placeholder="Search for songs, artists...">
-        </header>
-        <div id="content-area">
-            <div id="home-view">
-                <h2>Welcome to Spotify Clone</h2>
-                <p>Discover new music.</p>
-            </div>
-        </div>
+    <h3>Results</h3>
+    <div id="results" class="results"></div>
+
+    <h3>Playlists</h3>
+    <div id="playlists" class="playlists"></div>
+
+    <input id="newPlaylistName" placeholder="New playlist" style="margin-top:10px;width:100%;padding:8px;border-radius:8px;border:1px solid #555;background:#111;color:white;">
+    <button id="createPlaylistBtn" class="btn" style="margin-top:8px;width:100%;">Create</button>
+  </div>
+
+  <!-- MAIN PLAYER -->
+  <div class="main">
+    <div class="art-wrapper">
+      <img id="trackArt" src="">
     </div>
 
-    <div class="player-bar">
-        <div class="track-info">
-            <img id="track-art" src="https://via.placeholder.com/50" alt="Track Art">
-            <div>
-                <p id="track-title">No track selected</p>
-                <p id="track-artist">Artist</p>
-            </div>
-        </div>
-        <div class="controls">
-            <button id="prev-btn">⏮</button>
-            <button id="play-pause-btn">▶</button>
-            <button id="next-btn">⏭</button>
-        </div>
-        <div class="progress">
-            <input type="range" id="progress-bar" min="0" max="100" value="0">
-        </div>
-        <audio id="audio-player"></audio>
+    <h2 id="trackTitle">Select a song</h2>
+    <h4 id="trackArtist" style="color:var(--text-muted)">Your neon player is ready</h4>
+
+    <canvas id="visualizer"></canvas>
+
+    <div class="controls">
+      <button id="prevBtn" class="btn">⏮</button>
+      <button id="playPauseBtn" class="btn">▶</button>
+      <button id="nextBtn" class="btn">⏭</button>
+      <button id="shuffleBtn" class="btn">Shuffle</button>
     </div>
 
-    <div id="playlist-modal" class="modal">
-        <div class="modal-content">
-            <span class="close" id="close-modal">&times;</span>
-            <h2>Create Playlist</h2>
-            <input type="text" id="playlist-name" placeholder="Playlist Name" required>
-            <button id="save-playlist-btn">Save</button>
-        </div>
+    <div class="mixer">
+      <div>
+        <label>Bass</label><br>
+        <input type="range" id="bassSlider" min="-10" max="10" value="0">
+      </div>
+      <div>
+        <label>Treble</label><br>
+        <input type="range" id="trebleSlider" min="-10" max="10" value="0">
+      </div>
+      <div>
+        <label>Speed</label><br>
+        <input type="range" id="speedSlider" min="0.5" max="1.5" step="0.1" value="1">
+      </div>
+      <div>
+        <label>Volume</label><br>
+        <input type="range" id="volumeSlider" min="0" max="1" step="0.01" value="1">
+      </div>
     </div>
 
-    <script>
-        // DOM Elements
-        const homeLink = document.getElementById('home-link');
-        const searchLink = document.getElementById('search-link');
-        const libraryLink = document.getElementById('library-link');
-        const searchInput = document.getElementById('search-input');
-        const contentArea = document.getElementById('content-area');
-        const playlistList = document.getElementById('playlist-list');
-        const createPlaylistBtn = document.getElementById('create-playlist-btn');
-        const playlistModal = document.getElementById('playlist-modal');
-        const savePlaylistBtn = document.getElementById('save-playlist-btn');
-        const playPauseBtn = document.getElementById('play-pause-btn');
-        const prevBtn = document.getElementById('prev-btn');
-        const nextBtn = document.getElementById('next-btn');
-        const progressBar = document.getElementById('progress-bar');
-        const audioPlayer = document.getElementById('audio-player');
-        const trackTitle = document.getElementById('track-title');
-        const trackArtist = document.getElementById('track-artist');
+    <audio id="audio"></audio>
+  </div>
 
-        // Your Apps Script URL (Google Sheets backend) - UPDATED
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzPjpnJz7FW9QnpzlWOHvM6E_Wp-sy17x8jGXj76ZwSuEGdK5g-aGxphrtHkzxwzaTR/exec';
+</div>
 
-        // Built‑in playlist (your 4 songs)
-        let currentPlaylist = [
-            {
-                url: "https://cdnsongs.com/music/data/Single_Track/201605/Dasi_Na_Mere_Baare/128/Dasi_Na_Mere_Baare_1.mp3",
-                title: "Dasi Na Mere Baare",
-                artist: "Punjabi Artist"
-            },
-            {
-                url: "https://cdnsongs.com/music/data/Punjabi/202511/ROMEO/128/Together.mp3",
-                title: "Together",
-                artist: "Punjabi Artist"
-            },
-            {
-                url: "https://cdnsongs.com/music/data/Punjabi/202509/House_Navior/128/Deewane_1.mp3",
-                title: "Deewane",
-                artist: "Punjabi Artist"
-            },
-            {
-                url: "https://cdnsongs.com/music/data/Punjabi/202508/A_For_Arjan_2/128/Love_Gone.mp3",
-                title: "Love Gone",
-                artist: "Punjabi Artist"
-            }
-        ];
+<script>
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzPjpnJz7FW9QnpzlWOHvM6E_Wp-sy17x8jGXj76ZwSuEGdK5g-aGxphrtHkzxwzaTR/exec";
 
-        let currentTrackIndex = 0;
-        let isPlaying = false;
+let songs = [];
+let playlists = [];
+let currentIndex = -1;
+let isPlaying = false;
+let shuffle = false;
 
-        // Navigation
-        homeLink.addEventListener('click', (e) => {
-            e.preventDefault();
-            loadHome();
-        });
+const audio = document.getElementById("audio");
+const trackArt = document.getElementById("trackArt");
+const trackTitle = document.getElementById("trackTitle");
+const trackArtist = document.getElementById("trackArtist");
 
-        searchLink.addEventListener('click', (e) => {
-            e.preventDefault();
-            loadSearch();
-        });
+const canvas = document.getElementById("visualizer");
+const ctx = canvas.getContext("2d");
 
-        libraryLink.addEventListener('click', (e) => {
-            e.preventDefault();
-            loadLibrary();
-        });
+let audioCtx, analyser, sourceNode;
 
-        searchInput.addEventListener('input', handleSearch);
-        createPlaylistBtn.addEventListener('click', () => playlistModal.style.display = 'block');
-        savePlaylistBtn.addEventListener('click', createPlaylist);
-        document.getElementById('close-modal').addEventListener('click', () => playlistModal.style.display = 'none');
+// SEARCH
+document.getElementById("searchInput").addEventListener("input", async e => {
+  const q = e.target.value;
+  if (!q) return;
 
-        // Player controls
-        playPauseBtn.addEventListener('click', togglePlayPause);
-        prevBtn.addEventListener('click', playPrevious);
-        nextBtn.addEventListener('click', playNext);
-        progressBar.addEventListener('input', seekTrack);
+  const res = await fetch(`${SCRIPT_URL}?action=searchSongs&q=${encodeURIComponent(q)}`);
+  songs = await res.json();
+  renderResults();
+});
 
-        // Update progress bar as audio plays
-        audioPlayer.addEventListener('timeupdate', () => {
-            if (audioPlayer.duration) {
-                progressBar.value = (audioPlayer.currentTime / audioPlayer.duration) * 100;
-            }
-        });
+// RENDER SEARCH RESULTS
+function renderResults() {
+  const box = document.getElementById("results");
+  box.innerHTML = "";
 
-        // Auto-next when track ends
-        audioPlayer.addEventListener('ended', () => {
-            playNext();
-        });
+  songs.forEach((s, i) => {
+    const div = document.createElement("div");
+    div.className = "song-item";
+    div.innerHTML = `<b>${s[1]}</b><br><span style="color:#aaa">${s[2]}</span>`;
+    div.onclick = () => playSong(i);
+    box.appendChild(div);
+  });
+}
 
-        // Views
-        function loadHome() {
-            contentArea.innerHTML = '<h2>Welcome to Spotify Clone</h2><p>Discover new music.</p>';
-        }
+// PLAY SONG
+function playSong(i) {
+  currentIndex = i;
+  const [id, title, artist, url, art] = songs[i];
 
-        function loadSearch() {
-            contentArea.innerHTML = '<h2>Search</h2><div id="search-results"></div>';
-        }
+  audio.src = url;
+  audio.play();
+  isPlaying = true;
 
-        function loadLibrary() {
-            fetch(`${SCRIPT_URL}?action=getPlaylists`)
-                .then(res => res.json())
-                .then(playlists => {
-                    playlistList.innerHTML = playlists
-                        .map(p => `<li data-id="${p[0]}">${p[1]}</li>`)
-                        .join('');
-                })
-                .catch(err => console.error('Error loading playlists:', err));
-        }
+  trackTitle.textContent = title;
+  trackArtist.textContent = artist;
+  trackArt.src = art || "";
 
-        // Search
-        function handleSearch() {
-            const query = searchInput.value;
-            if (query.length < 3) return;
+  document.getElementById("playPauseBtn").textContent = "⏸";
 
-            fetch(`${SCRIPT_URL}?action=searchSongs&q=${encodeURIComponent(query)}`)
-                .then(res => res.json())
-                .then(results => {
-                    const resultsDiv = document.getElementById('search-results');
-                    resultsDiv.innerHTML = results.map(song => `
-                        <div class="song">
-                            <p>${song[1]} - ${song[2]}</p>
-                            <button onclick="playSongFromSearch('${song[3]}', '${song[1]}', '${song[2]}')">Play</button>
-                            <button onclick="addToPlaylist('${song[0]}')">Add to Playlist</button>
-                        </div>
-                    `).join('');
-                })
-                .catch(err => console.error('Error searching songs:', err));
-        }
+  setupVisualizer();
+}
 
-        // Playlist creation
-        function createPlaylist() {
-            const name = document.getElementById('playlist-name').value;
-            if (!name.trim()) return;
+// PLAY/PAUSE
+document.getElementById("playPauseBtn").onclick = () => {
+  if (!audio.src) return;
 
-            fetch(SCRIPT_URL, {
-                method: 'POST',
-                body: new URLSearchParams({ action: 'createPlaylist', name })
-            })
-            .then(() => {
-                playlistModal.style.display = 'none';
-                document.getElementById('playlist-name').value = '';
-                loadLibrary();
-            })
-            .catch(err => console.error('Error creating playlist:', err));
-        }
+  if (isPlaying) {
+    audio.pause();
+    isPlaying = false;
+    document.getElementById("playPauseBtn").textContent = "▶";
+  } else {
+    audio.play();
+    isPlaying = true;
+    document.getElementById("playPauseBtn").textContent = "⏸";
+  }
+};
 
-        // Core play function (used by playlist + search)
-        function playSong(url, title, artist) {
-            audioPlayer.src = url;
-            trackTitle.textContent = title;
-            trackArtist.textContent = artist;
-            audioPlayer.play();
-            isPlaying = true;
-            playPauseBtn.textContent = '⏸';
-        }
+// NEXT/PREV
+document.getElementById("nextBtn").onclick = () => {
+  if (!songs.length) return;
+  currentIndex = (currentIndex + 1) % songs.length;
+  playSong(currentIndex);
+};
 
-        // Called from search results (does not change currentPlaylist index)
-        window.playSongFromSearch = function(url, title, artist) {
-            playSong(url, title, artist);
-        };
+document.getElementById("prevBtn").onclick = () => {
+  if (!songs.length) return;
+  currentIndex = (currentIndex - 1 + songs.length) % songs.length;
+  playSong(currentIndex);
+};
 
-        function togglePlayPause() {
-            if (!audioPlayer.src) {
-                // If nothing loaded yet, start with first track in playlist
-                const track = currentPlaylist[currentTrackIndex];
-                playSong(track.url, track.title, track.artist);
-                return;
-            }
+// SHUFFLE
+document.getElementById("shuffleBtn").onclick = () => {
+  shuffle = !shuffle;
+  document.getElementById("shuffleBtn").style.background = shuffle ? "rgba(168,85,255,0.6)" : "rgba(168,85,255,0.3)";
+};
 
-            if (isPlaying) {
-                audioPlayer.pause();
-                playPauseBtn.textContent = '▶';
-            } else {
-                audioPlayer.play();
-                playPauseBtn.textContent = '⏸';
-            }
-            isPlaying = !isPlaying;
-        }
+// MIXER
+document.getElementById("volumeSlider").oninput = e => audio.volume = e.target.value;
+document.getElementById("speedSlider").oninput = e => audio.playbackRate = e.target.value;
 
-        function playPrevious() {
-            if (currentPlaylist.length === 0) return;
+// VISUALIZER
+function setupVisualizer() {
+  if (!audioCtx) audioCtx = new AudioContext();
 
-            currentTrackIndex =
-                (currentTrackIndex - 1 + currentPlaylist.length) % currentPlaylist.length;
+  if (sourceNode) sourceNode.disconnect();
 
-            const track = currentPlaylist[currentTrackIndex];
-            playSong(track.url, track.title, track.artist);
-        }
+  sourceNode = audioCtx.createMediaElementSource(audio);
+  analyser = audioCtx.createAnalyser();
+  analyser.fftSize = 256;
 
-        function playNext() {
-            if (currentPlaylist.length === 0) return;
+  sourceNode.connect(analyser);
+  analyser.connect(audioCtx.destination);
 
-            currentTrackIndex =
-                (currentTrackIndex + 1) % currentPlaylist.length;
+  drawBars();
+}
 
-            const track = currentPlaylist[currentTrackIndex];
-            playSong(track.url, track.title, track.artist);
-        }
+function drawBars() {
+  requestAnimationFrame(drawBars);
 
-        function seekTrack() {
-            if (!audioPlayer.duration) return;
-            const seekTime = (progressBar.value / 100) * audioPlayer.duration;
-            audioPlayer.currentTime = seekTime;
-        }
+  const buffer = new Uint8Array(analyser.frequencyBinCount);
+  analyser.getByteFrequencyData(buffer);
 
-        function addToPlaylist(songId) {
-            const playlistId = prompt('Enter Playlist ID (from library):');
-            if (!playlistId) return;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            fetch(SCRIPT_URL, {
-                method: 'POST',
-                body: new URLSearchParams({
-                    action: 'addToPlaylist',
-                    playlistId,
-                    songId
-                })
-            })
-            .catch(err => console.error('Error adding to playlist:', err));
-        }
+  const barWidth = canvas.width / 50;
 
-        // Initial load
-        loadHome();
-        loadLibrary();
-    </script>
+  for (let i = 0; i < 50; i++) {
+    const h = buffer[i] * 0.6;
+    ctx.fillStyle = `rgb(${150 + h}, ${80}, 255)`;
+    ctx.fillRect(i * barWidth, canvas.height - h, barWidth - 2, h);
+  }
+}
+
+// PLAYLISTS
+async function loadPlaylists() {
+  const res = await fetch(`${SCRIPT_URL}?action=getPlaylists`);
+  playlists = await res.json();
+  renderPlaylists();
+}
+
+function renderPlaylists() {
+  const box = document.getElementById("playlists");
+  box.innerHTML = "";
+
+  playlists.forEach(p => {
+    const div = document.createElement("div");
+    div.className = "playlist-item";
+    div.textContent = p[1];
+    box.appendChild(div);
+  });
+}
+
+document.getElementById("createPlaylistBtn").onclick = async () => {
+  const name = document.getElementById("newPlaylistName").value;
+  if (!name) return;
+
+  await fetch(SCRIPT_URL, {
+    method: "POST",
+    headers: {"Content-Type": "application/x-www-form-urlencoded"},
+    body: `action=createPlaylist&name=${encodeURIComponent(name)}`
+  });
+
+  loadPlaylists();
+};
+
+loadPlaylists();
+</script>
+
 </body>
 </html>
